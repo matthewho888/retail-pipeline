@@ -10,6 +10,7 @@ cleaned as (
         order_item_id,
         product_id,
         seller_id,
+        price,
         shipping_limit_date::timestamp as shipping_limit_at,
         freight_value
     from source
