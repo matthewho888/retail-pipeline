@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: mart_customer_orders
+    columns:
+      - name: customer_unique_id
+        tests:
+          - unique
+          - not_null
+      - name: most_recent_purchase
+        tests:
+          - not_null
+      - name: num_of_orders
+        tests:
+          - not_null
+      - name: total_sum
+        tests:
+          - not_null
+
+  - name: mart_order_fulfillment
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: delivery_status
+        tests:
+          - accepted_values:
+              values: ['on_time', 'late']
+
+  - name: mart_seller_performance
+    columns:
+      - name: seller_id
+        tests:
+          - unique
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null
+      - name: most_recent_sale
+        tests:
+          - not_null
+      - name: num_of_reviews
+        tests:
+          - not_null
