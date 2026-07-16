@@ -1,0 +1,21 @@
+retail_transforms:
+  outputs:
+    dev:
+      dbname: retail_db
+      host: localhost
+      pass: retail_pass
+      port: 5432
+      schema: retail_transforms
+      threads: 4
+      type: postgres
+      user: retail_user
+    prod:
+      dbname: retail_db
+      host: host.docker.internal
+      pass: retail_pass
+      port: 5432
+      schema: retail_transforms
+      threads: 4
+      type: postgres
+      user: retail_user
+  target: dev
