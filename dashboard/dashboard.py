@@ -202,7 +202,113 @@ try:
 
     elif page == "Fulfillment":
         st.header("Order Fulfillment")
-        st.info("We will build this section after Sellers.")
+        fulfillment_summary = run_query(
+            """
+            SELECT
+                COUNT(*) FILTER (
+                    WHERE order_status = 'delivered'
+                ) AS delivered_orders,
+
+                COUNT(*) FILTER (
+                    WHERE delivery_status = 'on_time'
+                ) AS on_time_orders,
+
+                COUNT(*) FILTER (
+                    WHERE delivery_status = 'late'
+                ) AS late_orders,
+
+                AVG(
+                    EXTRACT(EPOCH FROM days_difference) / 86400
+                ) FILTER (
+                    WHERE order_status = 'delivered'
+                ) AS average_days_difference
+
+            FROM retail_transforms.mart_order_fulfillment;
+            """
+        )
+
+        delivered_orders = int(
+            fulfillment_summary.loc[0, "delivered_orders"]
+        )
+
+        on_time_orders = int(
+            fulfillment_summary.loc[0, "on_time_orders"]
+        )
+
+        late_orders = int(
+            fulfillment_summary.loc[0, "late_orders"]
+        )
+
+        average_days_difference = float(
+            fulfillment_summary.loc[0, "average_days_difference"]
+        )
+
+        on_time_rate = (
+            on_time_orders / delivered_orders * 100
+            if delivered_orders > 0
+            else 0
+        )
+
+        column_one, column_two, column_three = st.columns(3)
+
+        column_one.metric(
+            "Delivered Orders",
+            f"{delivered_orders:,}",
+        )
+
+        column_two.metric(
+            "On-Time Delivery Rate",
+            f"{on_time_rate:.1f}%",
+        )
+
+        column_three.metric(
+            "Average Days Early/Late",
+            f"{average_days_difference:.1f}",
+        )
+
+        delivery_counts = run_query(
+            """
+            SELECT
+                delivery_status,
+                COUNT(*) AS order_count
+            FROM retail_transforms.mart_order_fulfillment
+            WHERE delivery_status IS NOT NULL
+            GROUP BY delivery_status
+            ORDER BY delivery_status;
+            """
+        )
+
+        st.subheader("Delivery Performance")
+
+        st.bar_chart(
+            delivery_counts,
+            x="delivery_status",
+            y="order_count",
+        )
+
+        recent_orders = run_query(
+            """
+            SELECT
+                order_id,
+                order_status,
+                ordered_at,
+                delivered_at,
+                estimated_delivery_at,
+                delivery_status,
+                days_difference
+            FROM retail_transforms.mart_order_fulfillment
+            ORDER BY ordered_at DESC
+            LIMIT 20;
+            """
+        )
+
+        st.subheader("Recent Fulfillment Records")
+
+        st.dataframe(
+            recent_orders,
+            use_container_width=True,
+            hide_index=True,
+        )
 
 except Exception as error:
     st.error("Dashboard query failed.")
