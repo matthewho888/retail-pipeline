@@ -1,6 +1,6 @@
 WITH orders AS (
     SELECT order_id, order_item_id, product_id, seller_id, price, shipping_limit_at
-    FROM retail_transforms.stg_order_items
+    FROM {{ ref('stg_order_items') }}
 ),
 
 joined_product_info AS (
@@ -8,7 +8,7 @@ joined_product_info AS (
         one.order_id, one.order_item_id, one.seller_id, one.product_id,
         two.product_category_name, one.price, one.shipping_limit_at
     FROM orders one
-    LEFT JOIN retail_transforms.stg_products two
+    LEFT JOIN {{ ref('stg_products') }} two
         ON one.product_id = two.product_id
 ),
 
@@ -19,7 +19,7 @@ joined_order_shipping AS (
         three.order_status, three.ordered_at, three.approved_at,
         three.shipped_at, three.delivered_at, three.estimated_delivery_at
     FROM joined_product_info two
-    LEFT JOIN retail_transforms.stg_orders three
+    LEFT JOIN {{ ref('stg_orders') }} three
         ON two.order_id = three.order_id
 ),
 joined_translation AS (
@@ -29,7 +29,7 @@ joined_translation AS (
         three.order_status, three.ordered_at, three.approved_at,
         three.shipped_at, three.delivered_at, three.estimated_delivery_at
     FROM joined_order_shipping three
-    LEFT JOIN retail_transforms.stg_category_translation four
+    LEFT JOIN {{ ref('stg_category_translation') }} four
         ON three.product_category_name = four.product_category_name
 ),
 joined_final AS (
@@ -39,7 +39,7 @@ joined_final AS (
         four.order_status, four.ordered_at, four.approved_at,
         four.shipped_at, four.delivered_at, four.estimated_delivery_at
 	FROM joined_translation four
-	LEFT JOIN retail_transforms.stg_customers five
+	LEFT JOIN {{ ref('stg_customers')}} five
 		ON four.customer_id = five.customer_id
 )
 

@@ -9,9 +9,9 @@ WITH seller_orders AS (
         MAX(orders.ordered_at) AS ordered_at,
         SUM(orders.price) AS order_revenue
 
-    FROM retail_transforms.int_orders_enriched AS orders
+    FROM {{ ref('int_orders_enriched') }} AS orders
 
-    LEFT JOIN retail_transforms.stg_sellers AS sellers
+    LEFT JOIN {{ ref('stg_sellers') }} AS sellers
         ON orders.seller_id = sellers.seller_id
 
     GROUP BY
@@ -27,7 +27,7 @@ reviews_by_order AS (
         order_id,
         AVG(review_score) AS review_score
 
-    FROM retail_transforms.stg_order_reviews
+    FROM {{ ref('stg_order_reviews') }}
 
     GROUP BY order_id
 )

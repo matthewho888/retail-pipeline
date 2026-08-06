@@ -10,4 +10,4 @@ SELECT DISTINCT
         ELSE NULL
     END AS delivery_status,
     delivered_at - estimated_delivery_at AS days_difference
-FROM retail_transforms.int_orders_enriched
+FROM {{ ref('int_orders_enriched') }}
