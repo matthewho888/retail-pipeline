@@ -2,6 +2,9 @@ version: 2
 
 models:
   - name: mart_customer_orders
+    description: >
+      One row per customer order with recency/frequency/monetary metrics,
+      used for customer segmentation and retention analysis.
     columns:
       - name: customer_unique_id
         tests:
@@ -18,6 +21,9 @@ models:
           - not_null
 
   - name: mart_order_fulfillment
+    description: >
+      Order-level fulfillment and delivery performance metrics, used to
+      analyze on-time delivery and operational issues.
     columns:
       - name: order_id
         tests:
@@ -29,6 +35,9 @@ models:
               values: ['on_time', 'late']
 
   - name: mart_seller_performance
+    description: >
+      Seller-level aggregated revenue, review scores, and sales metrics,
+      used to identify top-performing sellers.
     columns:
       - name: seller_id
         tests:

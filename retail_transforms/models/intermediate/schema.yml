@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: int_orders_enriched
+    description: >
+      Orders joined with seller and delivery details, enriched for downstream
+      mart consumption. Feeds all three mart models.
+
+  - name: int_customers_masked
+    description: >
+      Customer records with zip code generalized to the first 3 digits.
+      Serves as the access point for analyst_readonly instead of raw stg_customers,
+      which retains full precision.
+    columns:
+      - name: customer_zip_region
+        description: "Zip code truncated to 3 digits for privacy — not full precision."
+
+  - name: int_order_reviews_redacted
+    description: >
+      Review text with emails and phone numbers redacted via regex pattern matching.
+      Serves as the access point for analyst_readonly instead of raw stg_order_reviews.
+      Note: regex-based detection is not exhaustive (no name detection); validated
+      against synthetic PII test cases, not a production-grade NER solution.
+    columns:
+      - name: review_comment_redacted
+        description: "Review text with emails/phone numbers replaced by [REDACTED]."
